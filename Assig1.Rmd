@@ -1,0 +1,193 @@
+---
+title: "Assigment 1"
+author: "Neil Farrugia 17336831"
+date: "2022-10-10"
+output: html_document
+---
+
+
+
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 12px;
+  }
+td {  /* Table  */
+  font-size: 8px;
+}
+h1.title {
+  font-size: 38px;
+  color: DarkRed;
+}
+h1 { /* Header 1 */
+  font-size: 28px;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+  color: DarkBlue;
+}
+h3 { /* Header 3 */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I Neil Farrugia confirm that this assignment is my own work. I have not copied in part or whole or otherwise plagiarised the work of other students and/or persons. I confirm that I have read and understood the UCD School of Mathematics and Statistics regulations on plagiarism in the Week 5 folder on bright space.
+
+## Load data
+```{r}
+df <- read.csv("~/Masters/PredAnaI/Assignment.csv")
+#df[,"Age"] <- factor(df$Age)
+```
+
+# EDA
+
+### Question 1
+
+```{r}
+df16 <- df[which(df$Year == 2006),]
+df16m <- df16[which(df16$Sex == "Male"),] 
+df16f <- df16[which(df16$Sex == "Female"),] 
+
+#par(mfrow=c(1,2))
+boxplot(df16$P_Content~df16$Sex, col = c("purple","blue"),ylab ="%",xlab="Sex",
+        main="Boxplot Distribution of content percentage in 2006")
+par(mfrow=c(1,2))
+hist(df16m$P_Conten, freq = F, main = "Histogram and Density estimate of content percentage, Males",  xlab = "%", cex.main= 0.5)
+lines(density(df16m$P_Conten), lwd=2, col="blue")
+hist(df16f$P_Conten, freq = F, main = "Histogram and Density estimate of content percentage, Females",xlab = "%",cex.main= 0.5)
+lines(density(df16f$P_Conten), lwd=2,  col="purple")
+
+print("Male Summary")
+summary(df16m$P_Content)
+print("Female Summary")
+summary(df16f$P_Content)
+
+```
+
+From the EDA above both it is clear that the overall happiness when looking at the central tendacy (Mean, median) seems to be lower in males compared to females.\
+It is also evident the minimum is much lower in the males in comparison to the females. Whereas the maximum is the same
+The distribution plot seem a bit skewed. Both Males and Females are slightly right skewed. This can also be confirmed by looking the difference in the median to the mean. However they are both similar. This means generally speaking there a greater density of students that are in the lower end of the score distribution.\
+It's also evident that the variance is bigger in the males when looking at the size of the box compared to females. This can also be confirmed when looking at the IQR which is much bigger in the Males.\
+
+### Question 2
+
+```{r}
+dff <- df[which(df$Sex == "Female"),]
+
+#par(mfrow=c(1,2))
+boxplot(dff$P_Content~dff$Year, col = "purple",ylab ="%",xlab="Sex",
+        main="Boxplot Distribution of content percentage in females",ylim= c(20,80))
+par(mfrow=c(2,2))
+for (i in unique(df$Year)){
+  hist(dff[which(dff$Year==i),"P_Content"], freq = F, main = paste("Histogram and Density estimate of content percentage, Females in",i),  xlab = "%", cex.main= 0.5)
+  lines(density(dff[which(dff$Year==i),"P_Content"]), lwd=2, col="purple")
+}
+
+for (i in unique(df$Year)){
+  print(paste("Female",i,"Summary"))
+  print(summary(dff[which(dff$Year==i),"P_Content"]))
+}
+```
+From the result above the first the distribution of the year seem to be all slightly left skewed, however not by much and this does not include 2014 which has the same mean and median.\
+The size of the boxes and thus the IQR seems to get bigger as the years increase. The size seem to increase towards the bottom, meaning the 3rd quantile does not seem to change that much, but 1st quantile seem to decrease.\
+There is definitely a decreasing trend when looking at the 1st quantile. This trend is not necessarily evident when looking at the mean/median scores.\
+
+### Question 3
+
+```{r}
+dff <- df[which(df$Sex == "Male"),]
+
+#par(mfrow=c(1,2))
+boxplot(dff$P_Content~dff$Year, col = "blue",ylab ="%",xlab="Year",
+        main="Boxplot Distribution of content percentage in males",ylim= c(20,80))
+par(mfrow=c(2,2))
+for (i in unique(df$Year)){
+  hist(dff[which(dff$Year==i),"P_Content"], freq = F, main = paste("Histogram and Density estimate of content percentage, Females in",i),  xlab = "%", cex.main= 0.5)
+  lines(density(dff[which(dff$Year==i),"P_Content"]), lwd=2, col="blue")
+}
+
+for (i in unique(df$Year)){
+  print(paste("Male",i,"Summary"))
+  print(summary(dff[which(dff$Year==i),"P_Content"]))
+}
+```
+
+From looking at the boxplots it is evident that there is a decreasing trend percentage score, this can be confirmed by looking at the mean in the summary satistic, (black line boxplot). And also the median is decreasing.\
+What is also clear from looking at the histogram and density plot is that there is that all of the years are right skewed. Meaning that there is greater chance finding a male with a low percentage score. Or in other words there are more males with low scores than there are with high scores.\
+The skewness can be confirmed by looking at the median and mean difference.\
+The variance also seems to be bigger for the latter years, this can be seen by looking at he IQR or the size of the box in the box plot.\
+
+
+### Question 4
+
+```{r}
+df[,'Sex']<-factor(df$Sex)
+par(mfrow=c(2,2))
+for (i in unique(df$Year)){
+  boxplot(df[which(df$Year==i),"P_Content"]~df[which(df$Year==i),"Sex"], freq = F, main = paste("Boxplot Females vs Males,",i),  col = c("purple","Blue"), xlab = "Sex",ylab = "%", cex.main= 0.8, ylim= c(20,80))
+  lines(density(dff[which(dff$Year==i),"P_Content"]), lwd=2, col="blue")
+}
+
+```
+The illustration I have chosen is a boxplot, which looks at the distribution of percentage scores in Males and females seperatly for the 4 years.\
+What is evident is that in all 4 years the mean is higher in the females than the males.\
+Moreover both the 1st and 3rd quantiles are consisently higher in females. The minimum is also always lower in the males. This means that you will rarely find and female to be lower than around 50% scores.\
+The skewness  seems more consistent in the males, this can estimated by looking at how close the mean line is to the 1st quantile and the min value. In males the skweness is definitely for visible in the latter 3 years, whereas for the females it's not as clear. This would mean than although the males have a big spread or wide happiness scores it bis more dense towards the bottom end of the scores for the latter 3 years.\
+
+### Question 5
+```{r}
+library(ggplot2)
+library(gridExtra)
+library(grid)
+df[,"Age"] <- factor(df$Age)
+for(i in unique(df$Sex)){
+  print(paste("Correlation between Happiness Scores and Year in",i,"=",round(cor(df[which(df$Sex==i),"Year"], df[which(df$Sex==i),"P_Content"]),3) ))
+}
+
+#par(1,2)
+
+fplot<-ggplot(df[which(df$Sex=='Female'),], aes(x=Year, y = P_Content))+
+        geom_point(aes(color=Year))+
+        stat_smooth(method = "lm",
+                    color = "purple",
+                    se = T,
+                    size = 1)+
+        labs(title= "Females", y= "% Score")+
+        theme(axis.title=element_text(size=12))
+mplot<-ggplot(df[which(df$Sex=='Male'),], aes(x=Year, y = P_Content))+
+        geom_point(aes(color=Year))+
+        stat_smooth(method = "lm",
+                    color = "blue",
+                    se = T,
+                    size = 1)+
+        labs(title= "Males", y= "% Score")+
+        theme(plot.title = element_text(size=12))
+
+grid.arrange(fplot, mplot, ncol=2, top=textGrob("Scatter plot, Year vs Content Score" ))
+
+```
+
+It is evident that there is a negative correlation between content scores and years. As the years go on it seems that children happiness scores decreases.\
+However this correlation is weak for both Females and Males (correlation scores above). The regression points downwards but the slopes isn't at a big angle confirming a weak trend.\
+It's also important to note that the correlation scores are nearly equal between females and males. Meaning that the trend is observed in both sex.\
+\
+### Conclusion on EDA
+\
+In conclusion the EDA has shown that males generally score lower on the happiness scale in comparison to females.\
+Both males and females have a weak negative trend from 2006 to 2018.\
+\
+
+
